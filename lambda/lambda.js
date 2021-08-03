@@ -100,6 +100,12 @@ async function handler(request) {
                     return;
                 }
                 console.log(jwtKey.modeName + ": payload " + JSON.stringify(payload, null, '  '));
+                // JBA id tokens are valid for an hour and JBT ones for 10 minutes, so the common threshold is set at 3600 seconds 
+                if (Math.floor(Date.now() / 1000) + 3600 < payload.exp) {
+                    console.log(jwtKey.modeName + ': "Expiration time" (exp) claim is too far in the future');
+                    resolve(false);
+                    return;
+                }
                 resolve(jwtKey.verifyCallback(payload));
             });
         });
